@@ -1,121 +1,97 @@
 import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
+import { Squircle } from "@squircle-js/react";
+import {DragDropProvider} from '@dnd-kit/react';
+import TaskForm from './TaskForm'
+import missing from './assets/missing.png'
 import './App.css'
+import TaskItem from './TaskItem'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [IsFormOpen, setIsFormOpen] = useState(false)
+  const [tasks, setTasks] = useState([])
+
+  function handleAddTask(task){
+    setTasks(prevTasks => [...prevTasks, task])
+  }
+
+  function handleDragEnd(event) {
+    if (event.cancelled) return;
+    const { source, position } = event.operation;
+    if (!source) return;
+
+    const deltaX = position.current.x - position.initial.x;
+    const deltaY = position.current.y - position.initial.y;
+
+    setTasks((prevTasks) =>
+      prevTasks.map((task) =>
+        String(task.id) === String(source.id)
+          ? {
+              ...task,
+              x: task.x + deltaX,
+              y: task.y + deltaY,
+            }
+          : task
+      )
+    );
+  }
 
   return (
     <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+      <button
+      className="add-task-button"
+      aria-label="Create new task"
+      onClick={() => setIsFormOpen(true)}
+      >
+        +
+      </button>
 
-      <div className="ticks"></div>
+      <header
+      className="header"
+      >
+        <img src={missing} 
+        className="logo" width="60" height="60" alt="Logo"/>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+        <Squircle
+        className = "login-button"
+        onClick={() => console.log("Login clicked")}
+        cornerRadius={30}
+        cornerSmoothing={0.3}>
+          Log in
+        </Squircle>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
+        <Squircle
+        className = "sign-up-button"
+        onClick={() => console.log("Signup clicked")}
+        cornerRadius={30}
+        cornerSmoothing={0.9}>
+          Sign up
+        </Squircle>
+      </header>
+
+      {IsFormOpen && 
+        <TaskForm 
+        onClose={()=>setIsFormOpen(false)}
+        onAddTask={(task)=>handleAddTask(task)}/>}
+
+
+      <DragDropProvider 
+      onDragEnd={handleDragEnd}>
+        <div className="task-workspace">
+          {tasks.map((task) => (
+            <TaskItem 
+            key={task.id}
+            id={task.id}
+            name = {task.name}
+            dueDate = {task.dueDate}
+            x = {task.x}
+            y = {task.y}
+            />
+          ))}
+
+        </div>  
+      </DragDropProvider>
     </>
+      
   )
 }
 
