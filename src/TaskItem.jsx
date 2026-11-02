@@ -13,8 +13,8 @@ function TaskItem({id, name, dueDate, x, y}){
         className = {`task-item ${isDragging ? "is-dragging" : ""}`}
         style={{
                 position: "absolute",
-                left: x, 
-                top: y,}}>
+                left: `${x}px`, 
+                top: `${y}px`}}>
             <Squircle
             cornerRadius={20}
             cornerSmoothing={0.9}>

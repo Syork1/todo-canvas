@@ -412,3 +412,11 @@ body {
   cursor: grabbing;
   z-index: 1000;
 }
+
+.task-workspace {
+  position: relative;
+  width: 2000px;
+  height: 2000px;
+  background-color: #F9F3EC;
+  overflow: visible;
+}

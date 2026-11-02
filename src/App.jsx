@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Squircle } from "@squircle-js/react";
+import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import {DragDropProvider} from '@dnd-kit/react';
 import TaskForm from './TaskForm'
 import missing from './assets/missing.png'
@@ -14,13 +15,13 @@ function App() {
     setTasks(prevTasks => [...prevTasks, task])
   }
 
-  function handleDragEnd(event) {
+  function handleDragEnd(event, scale) {
     if (event.cancelled) return;
     const { source, position } = event.operation;
     if (!source) return;
 
-    const deltaX = position.current.x - position.initial.x;
-    const deltaY = position.current.y - position.initial.y;
+    const deltaX = (position.current.x - position.initial.x)/scale;
+    const deltaY = (position.current.y - position.initial.y)/scale;
 
     setTasks((prevTasks) =>
       prevTasks.map((task) =>
@@ -74,24 +75,49 @@ function App() {
         onAddTask={(task)=>handleAddTask(task)}/>}
 
 
-      <DragDropProvider 
-      onDragEnd={handleDragEnd}>
-        <div className="task-workspace">
-          {tasks.map((task) => (
-            <TaskItem 
-            key={task.id}
-            id={task.id}
-            name = {task.name}
-            dueDate = {task.dueDate}
-            x = {task.x}
-            y = {task.y}
-            />
-          ))}
+      <TransformWrapper
+      initialScale={1}
+      minScale={.25}
+      maxScale={3}
+      centerOnInit={false}
+      wheel={{
+        step: .0005
+      }}
+      panning={{ disabled: true }}
+      >
+        {({state})=>(
+        <TransformComponent
+        wrapperStyle={{
+          width: "100%", 
+          height: "calc(100vh - 65px)",
+          marginTop: "65px",
+          overflow: "hidden"
+        }}
+        contentStyle={{
+          width: "2000px", 
+          height: "2000px"
+        }}>
+          <DragDropProvider   
+          onDragEnd={(event)=>handleDragEnd(event, state.scale)}
+          >
+            <div className="task-workspace">
+              {tasks.map((task) => (
+                <TaskItem 
+                key={task.id}
+                id={task.id}
+                name = {task.name}
+                dueDate = {task.dueDate}
+                x = {task.x}
+                y = {task.y}
+                />
+              ))}
 
-        </div>  
-      </DragDropProvider>
-    </>
-      
+            </div>  
+          </DragDropProvider>
+        </TransformComponent>
+        )}
+      </TransformWrapper>
+    </> 
   )
 }
 
