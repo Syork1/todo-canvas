@@ -10,6 +10,7 @@ import TaskItem from './TaskItem'
 function App() {
   const [IsFormOpen, setIsFormOpen] = useState(false)
   const [tasks, setTasks] = useState([])
+  const [dragDisabled, setDragDisabled] = useState(false)
 
   function handleAddTask(task){
     setTasks(prevTasks => [...prevTasks, task])
@@ -22,6 +23,8 @@ function App() {
 
     const deltaX = (position.current.x - position.initial.x)/scale;
     const deltaY = (position.current.y - position.initial.y)/scale;
+
+    setDragDisabled(false);
 
     setTasks((prevTasks) =>
       prevTasks.map((task) =>
@@ -83,7 +86,7 @@ function App() {
       wheel={{
         step: .0005
       }}
-      panning={{ disabled: true }}
+      panning={{ disabled: dragDisabled }}
       >
         {({state})=>(
         <TransformComponent
@@ -98,6 +101,7 @@ function App() {
           height: "2000px"
         }}>
           <DragDropProvider   
+          onDragStart={()=>setDragDisabled(true)}
           onDragEnd={(event)=>handleDragEnd(event, state.scale)}
           >
             <div className="task-workspace">
