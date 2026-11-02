@@ -17,6 +17,8 @@ function App() {
   }
 
   function handleDragEnd(event, scale) {
+    setDragDisabled(false);
+
     if (event.cancelled) return;
     const { source, position } = event.operation;
     if (!source) return;
@@ -24,7 +26,7 @@ function App() {
     const deltaX = (position.current.x - position.initial.x)/scale;
     const deltaY = (position.current.y - position.initial.y)/scale;
 
-    setDragDisabled(false);
+    
 
     setTasks((prevTasks) =>
       prevTasks.map((task) =>
@@ -86,7 +88,9 @@ function App() {
       wheel={{
         step: .0005
       }}
-      panning={{ disabled: dragDisabled }}
+      panning={{ disabled: dragDisabled, 
+        excluded: ["task-item"]
+       }}
       >
         {({state})=>(
         <TransformComponent

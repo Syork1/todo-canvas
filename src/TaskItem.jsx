@@ -8,8 +8,9 @@ function TaskItem({id, name, dueDate, x, y}){
     });
 
     return(
-        <div
+        <div 
         ref={ref}
+        data-no-pan
         className = {`task-item ${isDragging ? "is-dragging" : ""}`}
         style={{
                 position: "absolute",
